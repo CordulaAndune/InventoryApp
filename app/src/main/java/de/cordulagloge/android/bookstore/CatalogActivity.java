@@ -3,28 +3,43 @@ package de.cordulagloge.android.bookstore;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
-
-import javax.xml.transform.Templates;
+import android.util.Log;
+import android.view.View;
 
 import de.cordulagloge.android.bookstore.data.BookDbHelper;
+import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
 
 import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 
 public class CatalogActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = CatalogActivity.class.getName();
     private final String DB_NAME = "books.db";
     private final int DB_VERSION = 1;
     private BookDbHelper bookDbHelper;
+    private ActivityCatalogBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityCatalogBinding binding = Data setContentView(R.layout.activity_catalog);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         bookDbHelper = new BookDbHelper(this, DB_NAME, DB_VERSION);
+        binding.insertButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                insertDummyBook();
+                readWholeDataBase();
+            }
+        });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        readWholeDataBase();
     }
 
     /**
@@ -64,13 +79,33 @@ public class CatalogActivity extends AppCompatActivity {
                 , null
                 , null
                 , null);
-        TextView dataTextView = findViewById(R.id.data_text_view);
-        try {
-            while(cursor.moveToNext()){
 
+        try {
+            binding.dataTextView.setText("Books in table: " + cursor.getCount() + "\n");
+            String placeholder = " - ";
+            String[] columnNames = cursor.getColumnNames();
+            for (String name : columnNames) {
+                binding.dataTextView.append(name + placeholder);
             }
-        }
-        finally {
+            int indexID = cursor.getColumnIndex(BookEntry._ID);
+            int indexName = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME);
+            int indexPrice = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE);
+            int indexQuantity = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY);
+            int indexSupplier = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER);
+            int indexPhone = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE);
+
+            while (cursor.moveToNext()) {
+                String row = "\n"
+                        + cursor.getString(indexID) + placeholder
+                        + cursor.getString(indexName) + placeholder
+                        + cursor.getString(indexPrice) + placeholder
+                        + cursor.getInt(indexQuantity) + placeholder
+                        + cursor.getString(indexSupplier) + placeholder
+                        + cursor.getString(indexPhone);
+                Log.i(LOG_TAG, row);
+                binding.dataTextView.append(row);
+            }
+        } finally {
             cursor.close();
         }
     }
