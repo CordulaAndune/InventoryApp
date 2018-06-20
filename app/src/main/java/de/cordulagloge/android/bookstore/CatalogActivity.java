@@ -22,8 +22,9 @@ public class CatalogActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_catalog);
+        ActivityCatalogBinding binding = Data setContentView(R.layout.activity_catalog);
         bookDbHelper = new BookDbHelper(this, DB_NAME, DB_VERSION);
+
     }
 
     /**
