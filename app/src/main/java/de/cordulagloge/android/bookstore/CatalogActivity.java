@@ -47,7 +47,7 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void insertDummyBook() {
         SQLiteDatabase bookDB = bookDbHelper.getWritableDatabase();
-
+        // set dummy data
         String bookName = "The Hobbit";
         String bookPrice = "$8.99";
         int bookQuantity = 2;
@@ -57,7 +57,7 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(BookEntry.COLUMN_BOOK_PRICE, bookPrice);
         values.put(BookEntry.COLUMN_BOOK_QUANTITY, bookQuantity);
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
-
+        // insert data into books table
         bookDB.insert(BookEntry.TABLE_NAME, null, values);
     }
 
@@ -66,12 +66,14 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void readWholeDataBase() {
         SQLiteDatabase bookDB = bookDbHelper.getReadableDatabase();
+        // shwo all columns from books table
         String[] projection = new String[]{BookEntry._ID
                 , BookEntry.COLUMN_BOOK_NAME
                 , BookEntry.COLUMN_BOOK_PRICE
                 , BookEntry.COLUMN_BOOK_QUANTITY
                 , BookEntry.COLUMN_BOOK_SUPPLIER
                 , BookEntry.COLUMN_BOOK_SUPPLIER_PHONE};
+        // read all columns and rows into cursor
         Cursor cursor = bookDB.query(BookEntry.TABLE_NAME
                 , projection
                 , null
@@ -79,21 +81,22 @@ public class CatalogActivity extends AppCompatActivity {
                 , null
                 , null
                 , null);
-
         try {
+            // show row count and table schema on screen
             binding.dataTextView.setText("Books in table: " + cursor.getCount() + "\n");
             String placeholder = " - ";
             String[] columnNames = cursor.getColumnNames();
             for (String name : columnNames) {
                 binding.dataTextView.append(name + placeholder);
             }
+            // get indices of columns
             int indexID = cursor.getColumnIndex(BookEntry._ID);
             int indexName = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME);
             int indexPrice = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE);
             int indexQuantity = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY);
             int indexSupplier = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER);
             int indexPhone = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE);
-
+            // read each row and show on screen
             while (cursor.moveToNext()) {
                 String row = "\n"
                         + cursor.getString(indexID) + placeholder
@@ -106,6 +109,7 @@ public class CatalogActivity extends AppCompatActivity {
                 binding.dataTextView.append(row);
             }
         } finally {
+            // close cursor after finishing reading
             cursor.close();
         }
     }
