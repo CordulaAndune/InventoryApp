@@ -7,7 +7,8 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import de.cordulagloge.android.bookstore.data.BookDbHelper;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
@@ -27,13 +28,30 @@ public class CatalogActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         bookDbHelper = new BookDbHelper(this, DB_NAME, DB_VERSION);
-        binding.insertButton.setOnClickListener(new View.OnClickListener() {
+       /* binding.insertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 insertDummyBook();
                 readWholeDataBase();
             }
-        });
+        });*/
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_catalog, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_delete_all_item:
+                break;
+            case R.id.menu_delete_sold_out:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -83,11 +101,11 @@ public class CatalogActivity extends AppCompatActivity {
                 , null);
         try {
             // show row count and table schema on screen
-            binding.dataTextView.setText("Books in table: " + cursor.getCount() + "\n");
+            //binding.dataTextView.setText("Books in table: " + cursor.getCount() + "\n");
             String placeholder = " - ";
             String[] columnNames = cursor.getColumnNames();
             for (String name : columnNames) {
-                binding.dataTextView.append(name + placeholder);
+                //binding.dataTextView.append(name + placeholder);
             }
             // get indices of columns
             int indexID = cursor.getColumnIndex(BookEntry._ID);
@@ -106,7 +124,7 @@ public class CatalogActivity extends AppCompatActivity {
                         + cursor.getString(indexSupplier) + placeholder
                         + cursor.getString(indexPhone);
                 Log.i(LOG_TAG, row);
-                binding.dataTextView.append(row);
+                //binding.dataTextView.append(row);
             }
         } finally {
             // close cursor after finishing reading

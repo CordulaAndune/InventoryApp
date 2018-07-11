@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Book Store</string>
+    <string name="menu_delete_all_items">Delete all items</string>
+    <string name="menu_delete_sold_out_items">Delete sold out items</string>
 </resources>
