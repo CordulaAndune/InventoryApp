@@ -1,33 +1,38 @@
 package de.cordulagloge.android.bookstore;
 
-import android.content.ContentValues;
+import android.app.LoaderManager;
+import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import de.cordulagloge.android.bookstore.data.BookDbHelper;
+import de.cordulagloge.android.bookstore.data.BookProvider;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
 
 import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = CatalogActivity.class.getName();
-    private final String DB_NAME = "books.db";
-    private final int DB_VERSION = 1;
-    private BookDbHelper bookDbHelper;
+    private static final int INVENTORY_LOADER = 0;
+    private BookProvider mBookProvider;
     private ActivityCatalogBinding binding;
+    private RecyclerView bookList;
+    private BookAdapter bookAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
-        bookDbHelper = new BookDbHelper(this, DB_NAME, DB_VERSION);
+        mBookProvider = new BookProvider();
+        bookAdapter = new BookAdapter(this, null);
+        binding.inventoryList.setAdapter(bookAdapter);
+        getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
        /* binding.insertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,13 +62,13 @@ public class CatalogActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        readWholeDataBase();
     }
+
 
     /**
      * insert dummy data into database table books
      */
-    private void insertDummyBook() {
+   /* private void insertDummyBook() {
         SQLiteDatabase bookDB = bookDbHelper.getWritableDatabase();
         // set dummy data
         String bookName = "The Hobbit";
@@ -77,14 +82,10 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
         // insert data into books table
         bookDB.insert(BookEntry.TABLE_NAME, null, values);
-    }
-
-    /**
-     * read complete database with all columns and rows
-     */
-    private void readWholeDataBase() {
-        SQLiteDatabase bookDB = bookDbHelper.getReadableDatabase();
-        // shwo all columns from books table
+    }*/
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        // show all columns from books table
         String[] projection = new String[]{BookEntry._ID
                 , BookEntry.COLUMN_BOOK_NAME
                 , BookEntry.COLUMN_BOOK_PRICE
@@ -92,43 +93,23 @@ public class CatalogActivity extends AppCompatActivity {
                 , BookEntry.COLUMN_BOOK_SUPPLIER
                 , BookEntry.COLUMN_BOOK_SUPPLIER_PHONE};
         // read all columns and rows into cursor
-        Cursor cursor = bookDB.query(BookEntry.TABLE_NAME
-                , projection
-                , null
-                , null
-                , null
-                , null
-                , null);
-        try {
-            // show row count and table schema on screen
-            //binding.dataTextView.setText("Books in table: " + cursor.getCount() + "\n");
-            String placeholder = " - ";
-            String[] columnNames = cursor.getColumnNames();
-            for (String name : columnNames) {
-                //binding.dataTextView.append(name + placeholder);
-            }
-            // get indices of columns
-            int indexID = cursor.getColumnIndex(BookEntry._ID);
-            int indexName = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME);
-            int indexPrice = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE);
-            int indexQuantity = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY);
-            int indexSupplier = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER);
-            int indexPhone = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE);
-            // read each row and show on screen
-            while (cursor.moveToNext()) {
-                String row = "\n"
-                        + cursor.getString(indexID) + placeholder
-                        + cursor.getString(indexName) + placeholder
-                        + cursor.getString(indexPrice) + placeholder
-                        + cursor.getInt(indexQuantity) + placeholder
-                        + cursor.getString(indexSupplier) + placeholder
-                        + cursor.getString(indexPhone);
-                Log.i(LOG_TAG, row);
-                //binding.dataTextView.append(row);
-            }
-        } finally {
-            // close cursor after finishing reading
-            cursor.close();
+        Cursor cursor = mBookProvider.query(BookEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor != null) {
+            bookAdapter.swapCursor(cursor);
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        bookAdapter.swapCursor(null);
     }
 }
