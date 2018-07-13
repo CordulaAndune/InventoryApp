@@ -1,11 +1,15 @@
 package de.cordulagloge.android.bookstore;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +35,8 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         mBookProvider = new BookProvider();
         bookAdapter = new BookAdapter(this, null);
+        binding.inventoryList.setLayoutManager(new LinearLayoutManager(this));
+        binding.inventoryList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         binding.inventoryList.setAdapter(bookAdapter);
         getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
        /* binding.insertButton.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +58,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete_all_item:
+                insertDummyBook();
                 break;
             case R.id.menu_delete_sold_out:
                 break;
@@ -68,11 +75,10 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     /**
      * insert dummy data into database table books
      */
-   /* private void insertDummyBook() {
-        SQLiteDatabase bookDB = bookDbHelper.getWritableDatabase();
+    private void insertDummyBook() {
         // set dummy data
         String bookName = "The Hobbit";
-        String bookPrice = "$8.99";
+        double bookPrice = 1;
         int bookQuantity = 2;
         String supplier = "bookstore.com";
         ContentValues values = new ContentValues();
@@ -81,24 +87,21 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         values.put(BookEntry.COLUMN_BOOK_QUANTITY, bookQuantity);
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
         // insert data into books table
-        bookDB.insert(BookEntry.TABLE_NAME, null, values);
-    }*/
+        getContentResolver().insert(BookEntry.CONTENT_URI, values);
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // show all columns from books table
         String[] projection = new String[]{BookEntry._ID
-                , BookEntry.COLUMN_BOOK_NAME
-                , BookEntry.COLUMN_BOOK_PRICE
-                , BookEntry.COLUMN_BOOK_QUANTITY
-                , BookEntry.COLUMN_BOOK_SUPPLIER
-                , BookEntry.COLUMN_BOOK_SUPPLIER_PHONE};
-        // read all columns and rows into cursor
-        Cursor cursor = mBookProvider.query(BookEntry.CONTENT_URI,
+                , BookEntry.COLUMN_BOOK_NAME};
+
+        return new CursorLoader(this,
+                BookEntry.CONTENT_URI,
                 projection,
                 null,
                 null,
                 null);
-        return null;
     }
 
     @Override

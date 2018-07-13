@@ -44,7 +44,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         //inflating is done by cursor adapter
         View v = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
-        return new ViewHolder(v);
+        mViewHolder = new ViewHolder(v);
+        return mViewHolder;
     }
 
     @Override
@@ -52,7 +53,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         // Passing the binding operation to cursor loader
         mCursorAdapter.getCursor().moveToPosition(position);
         mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
-        mViewHolder = holder;
     }
 
     @Override

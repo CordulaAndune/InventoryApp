@@ -104,7 +104,7 @@ public class BookProvider extends ContentProvider {
                 try {
                     makeSanityCheck(contentValues);
                     Uri newUri = insertBook(uri, contentValues);
-                    getContext().getContentResolver().notifyChange(uri, null);
+                    getContext().getContentResolver().notifyChange(newUri, null);
                     return newUri;
                 } catch (IllegalArgumentException e) {
                     Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();

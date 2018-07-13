@@ -3,7 +3,6 @@ package de.cordulagloge.android.bookstore.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 
@@ -28,11 +27,11 @@ public class BookDbHelper extends SQLiteOpenHelper {
         String SQL_CREATE_BOOKS_TABLE = "CREATE TABLE " + BookEntry.TABLE_NAME + "("
                 + BookEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + BookEntry.COLUMN_BOOK_NAME + " TEXT NOT NULL, "
-                + BookEntry.COLUMN_BOOK_PRICE + " REAL NOT NULL, "
+                + BookEntry.COLUMN_BOOK_PRICE + " INTEGER NOT NULL, "
                 + BookEntry.COLUMN_BOOK_QUANTITY + " INTEGER NOT NULL DEFAULT 1, "
                 + BookEntry.COLUMN_BOOK_SUPPLIER + " TEXT NOT NULL DEFAULT 'n.a.', "
                 + BookEntry.COLUMN_BOOK_SUPPLIER_PHONE + " TEXT NOT NULL DEFAULT 'n.a.');";
-        Log.i(LOG_TAG, SQL_CREATE_BOOKS_TABLE);
+
         sqLiteDatabase.execSQL(SQL_CREATE_BOOKS_TABLE);
     }
 
