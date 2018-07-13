@@ -9,6 +9,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
 
 import static de.cordulagloge.android.bookstore.data.BookContract.BOOK_PATH;
 import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
@@ -19,6 +22,7 @@ import static de.cordulagloge.android.bookstore.data.BookContract.CONTENT_AUTHOR
  */
 public class BookProvider extends ContentProvider {
 
+    private static final String LOG_TAG = BookProvider.class.getName();
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int BOOKS = 100;
     private static final int BOOKS_ID = 101;
@@ -94,7 +98,58 @@ public class BookProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+        final int match = mUriMatcher.match(uri);
+        switch (match) {
+            case BOOKS:
+                try {
+                    makeSanityCheck(contentValues);
+                    Uri newUri = insertBook(uri, contentValues);
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    return newUri;
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(LOG_TAG, "Invalid value: ", e);
+                    return null;
+                }
+            default:
+                throw new IllegalStateException("Unsupported uri for insertion: " + uri);
+        }
+    }
+
+    private Uri insertBook(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase database = mBookDbHelper.getWritableDatabase();
+        long newRowID = database.insert(BookEntry.TABLE_NAME,
+                null,
+                contentValues);
+        if (newRowID == -1) {
+            return null;
+        } else {
+            return ContentUris.withAppendedId(uri, newRowID);
+        }
+    }
+
+    private void makeSanityCheck(ContentValues contentValues) throws IllegalArgumentException {
+        // check if product name is not null and valid
+        if (contentValues.containsKey(BookEntry.COLUMN_BOOK_NAME)) {
+            String name = contentValues.getAsString(BookEntry.COLUMN_BOOK_NAME);
+            if (TextUtils.isEmpty(name)) {
+                throw new IllegalArgumentException("Item requires a valid name.");
+            }
+        }
+        // check if quantity is positive or 0
+        if (contentValues.containsKey(BookEntry.COLUMN_BOOK_QUANTITY)) {
+            int quantity = contentValues.getAsInteger(BookEntry.COLUMN_BOOK_QUANTITY);
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity has to be positive.");
+            }
+        }
+        // check if price is not null and positive
+        if (contentValues.containsKey(BookEntry.COLUMN_BOOK_PRICE)) {
+            double price = contentValues.getAsDouble(BookEntry.COLUMN_BOOK_PRICE);
+            if (price < 0) {
+                throw new IllegalArgumentException("Price has to be a positive value");
+            }
+        }
     }
 
     @Override

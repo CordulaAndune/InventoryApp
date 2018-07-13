@@ -22,6 +22,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     private Context mContext;
     private CursorAdapter mCursorAdapter;
+    private ViewHolder mViewHolder;
 
     public BookAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -33,9 +34,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
             @Override
             public void bindView(View view, Context context, Cursor cursor) {
-                TextView nameTextView = view.findViewById(R.id.name_text_view);
-                String name = cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME));
-                nameTextView.setText(name);
+                mViewHolder.bindCursor(cursor);
             }
         };
     }
@@ -52,7 +51,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Passing the binding operation to cursor loader
         mCursorAdapter.getCursor().moveToPosition(position);
-        mCursorAdapter.bindView(holder.itemView, mContext, mCursorAdapter.getCursor());
+        mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
+        mViewHolder = holder;
     }
 
     @Override
@@ -73,5 +73,11 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             mNameTextView = itemView.findViewById(R.id.name_text_view);
             // TODO: databinding
         }
+
+        public void bindCursor(Cursor cursor) {
+            String name = cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME));
+            mNameTextView.setText(name);
+        }
+
     }
 }
