@@ -3,6 +3,7 @@ package de.cordulagloge.android.bookstore;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import de.cordulagloge.android.bookstore.data.BookProvider;
@@ -35,6 +37,16 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         mBookProvider = new BookProvider();
+        setRecyclerView();
+        setAddButton();
+        getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
+    }
+
+    /**
+     * Set up RecyclerView with horizontal dividers and {@link #bookAdapter}
+     * onItemClick: open EditorActivity for clicked item
+     */
+    private void setRecyclerView() {
         bookAdapter = new BookAdapter(this, null, new BookAdapter.CustomOnItemClickListener() {
             @Override
             public void onItemClick(long id) {
@@ -45,14 +57,15 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         binding.inventoryList.setLayoutManager(new LinearLayoutManager(this));
         binding.inventoryList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         binding.inventoryList.setAdapter(bookAdapter);
-        getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
-       /* binding.insertButton.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private void setAddButton() {
+        binding.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertDummyBook();
-                readWholeDataBase();
+                startActivity(new Intent(CatalogActivity.this, EditorActivity.class));
             }
-        });*/
+        });
     }
 
     @Override
