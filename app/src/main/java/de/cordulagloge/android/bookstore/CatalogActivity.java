@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import de.cordulagloge.android.bookstore.data.BookProvider;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
@@ -34,7 +35,13 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         mBookProvider = new BookProvider();
-        bookAdapter = new BookAdapter(this, null);
+        bookAdapter = new BookAdapter(this, null, new BookAdapter.CustomOnItemClickListener() {
+            @Override
+            public void onItemClick(long id) {
+                Toast.makeText(CatalogActivity.this, "clicked id: " + id, Toast.LENGTH_SHORT).show();
+                //TODO: open EditorView
+            }
+        });
         binding.inventoryList.setLayoutManager(new LinearLayoutManager(this));
         binding.inventoryList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         binding.inventoryList.setAdapter(bookAdapter);
