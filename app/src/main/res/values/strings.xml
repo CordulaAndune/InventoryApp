@@ -2,4 +2,9 @@
     <string name="app_name">Book Store</string>
     <string name="menu_delete_all_items">Delete all items</string>
     <string name="menu_delete_sold_out_items">Delete sold out items</string>
+    <string name="label_product_name">Product name</string>
+    <string name="label_price">Price</string>
+    <string name="label_supplier">Supplier</string>
+    <string name="label_phone">Phone Number</string>
+    <string name="label_quantity">Quantity</string>
 </resources>
