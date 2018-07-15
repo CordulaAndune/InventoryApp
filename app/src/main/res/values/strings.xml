@@ -10,4 +10,8 @@
     <string name="menu_delete_item">Delete item</string>
     <string name="menu_settings">Settings</string>
     <string name="menu_save_item">Save item</string>
+    <string name="msg_item_changed">Item data changed.</string>
+    <string name="msg_item_not_changed">Item could not be changed.</string>
+    <string name="msg_item_saved">Item saved.</string>
+    <string name="msg_item_not_saved">Item was not be saved.</string>
 </resources>

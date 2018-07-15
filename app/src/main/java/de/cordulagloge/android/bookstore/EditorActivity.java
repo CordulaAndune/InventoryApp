@@ -1,15 +1,22 @@
 package de.cordulagloge.android.bookstore;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import de.cordulagloge.android.bookstore.databinding.ActivityEditorBinding;
+
+import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 
 /**
  * TextInputLayout: based on Tutorial on https://www.androidhive.info/2015/09/android-material-design-floating-labels-for-edittext/
@@ -18,12 +25,18 @@ import de.cordulagloge.android.bookstore.databinding.ActivityEditorBinding;
 public class EditorActivity extends AppCompatActivity {
 
     private ActivityEditorBinding binding;
+    private Uri dataUri;
+    private boolean isItemChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_editor);
+        Intent intent = getIntent();
+        dataUri = intent.getData();
+        binding.quantityEditText.setText("1");
         setupTextWatcher();
+        isItemChanged = false;
     }
 
     private void setupTextWatcher() {
@@ -48,13 +61,58 @@ public class EditorActivity extends AppCompatActivity {
                 // TODO: delete Item
                 break;
             case R.id.menu_save_item:
-                //TODO: save item
+                savePet();
                 break;
             case R.id.menu_settings:
                 //TODO:settings open
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void savePet() {
+        String name = binding.nameEditText.getText().toString().trim();
+        String priceString = binding.priceEditText.getText().toString().trim().replace(",", ".");
+        double price = 0;
+        if (TextUtils.isEmpty(priceString)) {
+            price = Double.parseDouble(priceString);
+        }
+        String supplier = binding.supplierEditText.getText().toString().trim();
+        String phone = binding.phoneEditText.getText().toString().trim();
+        String quantityString = binding.quantityEditText.getText().toString().trim();
+        int quantity = 1;
+        if (!TextUtils.isEmpty(quantityString)) {
+            quantity = Integer.parseInt(quantityString);
+        }
+        //TODO: check inputs
+        // ContentValues
+        ContentValues values = new ContentValues();
+        values.put(BookEntry.COLUMN_BOOK_NAME, name);
+        values.put(BookEntry.COLUMN_BOOK_PRICE, price);
+        values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
+        values.put(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE, phone);
+        values.put(BookEntry.COLUMN_BOOK_QUANTITY, quantity);
+        if (dataUri != null) {
+            int newRowID = getContentResolver().update(dataUri,
+                    values,
+                    null,
+                    null);
+            if (newRowID != -1) {
+                Toast.makeText(this, R.string.msg_item_changed, Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, R.string.msg_item_not_changed, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Uri newRowUri = getContentResolver().insert(BookEntry.CONTENT_URI, values);
+            if (newRowUri != null) {
+                Toast.makeText(this, R.string.msg_item_saved, Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(this, R.string.msg_item_not_saved, Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 
     private class CustomTextWatcher implements TextWatcher {
@@ -77,6 +135,7 @@ public class EditorActivity extends AppCompatActivity {
 
         @Override
         public void afterTextChanged(Editable editable) {
+            isItemChanged = true;
             switch (mView.getId()) {
                 case R.id.name_edit_text:
                     break;
