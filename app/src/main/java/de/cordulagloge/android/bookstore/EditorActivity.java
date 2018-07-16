@@ -1,7 +1,11 @@
 package de.cordulagloge.android.bookstore;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,11 +26,12 @@ import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
  * TextInputLayout: based on Tutorial on https://www.androidhive.info/2015/09/android-material-design-floating-labels-for-edittext/
  */
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private ActivityEditorBinding binding;
     private Uri dataUri;
     private boolean isItemChanged;
+    private final static int DATA_LOADER = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,9 @@ public class EditorActivity extends AppCompatActivity {
         binding.quantityEditText.setText("1");
         setupTextWatcher();
         isItemChanged = false;
+        if (dataUri != null) {
+            getLoaderManager().initLoader(DATA_LOADER, null, this);
+        }
     }
 
     private void setupTextWatcher() {
@@ -84,7 +92,12 @@ public class EditorActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(quantityString)) {
             quantity = Integer.parseInt(quantityString);
         }
-        //TODO: check inputs
+        if (TextUtils.isEmpty(name) &&
+                TextUtils.isEmpty(supplier) &&
+                TextUtils.isEmpty(phone) &&
+                price == 0) {
+            return;
+        }
         // ContentValues
         ContentValues values = new ContentValues();
         values.put(BookEntry.COLUMN_BOOK_NAME, name);
@@ -113,6 +126,45 @@ public class EditorActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = new String[]{BookEntry.COLUMN_BOOK_NAME,
+                BookEntry.COLUMN_BOOK_PRICE,
+                BookEntry.COLUMN_BOOK_SUPPLIER,
+                BookEntry.COLUMN_BOOK_SUPPLIER_PHONE,
+                BookEntry.COLUMN_BOOK_QUANTITY};
+        return new CursorLoader(this,
+                dataUri,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        // show item data into UI
+        if (cursor == null || cursor.getCount() < 1) {
+            return;
+        } else {
+            cursor.moveToFirst();
+            binding.nameEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME)));
+            binding.priceEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE)));
+            binding.supplierEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER)));
+            binding.phoneEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE)));
+            binding.quantityEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY)));
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        binding.nameEditText.setText("");
+        binding.priceEditText.setText("");
+        binding.supplierEditText.setText("");
+        binding.phoneEditText.setText("");
+        binding.quantityEditText.setText("1");
     }
 
     private class CustomTextWatcher implements TextWatcher {

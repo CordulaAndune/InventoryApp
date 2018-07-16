@@ -1,6 +1,7 @@
 package de.cordulagloge.android.bookstore;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -15,7 +16,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import de.cordulagloge.android.bookstore.data.BookProvider;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
@@ -50,8 +50,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         bookAdapter = new BookAdapter(this, null, new BookAdapter.CustomOnItemClickListener() {
             @Override
             public void onItemClick(long id) {
-                Toast.makeText(CatalogActivity.this, "clicked id: " + id, Toast.LENGTH_SHORT).show();
-                //TODO: open EditorView
+                Intent editorIntent = new Intent(CatalogActivity.this, EditorActivity.class);
+                editorIntent.setData(ContentUris.withAppendedId(BookEntry.CONTENT_URI, id));
+                startActivity(editorIntent);
             }
         });
         binding.inventoryList.setLayoutManager(new LinearLayoutManager(this));
