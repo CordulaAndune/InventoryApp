@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,8 +38,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_editor);
+        // get item uri if item should be changed
         Intent intent = getIntent();
         dataUri = intent.getData();
+        Log.i("DataUri", String.valueOf(dataUri));
         binding.quantityEditText.setText("1");
         setupTextWatcher();
         isItemChanged = false;
@@ -66,7 +69,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.menu_delete_item:
-                // TODO: delete Item
+                deletePet();
+                finish();
                 break;
             case R.id.menu_save_item:
                 savePet();
@@ -76,6 +80,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deletePet() {
+        if (dataUri != null) {
+            int deletedRows = getContentResolver().delete(dataUri, null, null);
+            Log.i("Deleted ROws: ", String.valueOf(deletedRows));
+            if (deletedRows != -1) {
+                Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Item not deleted", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void savePet() {
@@ -105,12 +121,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE, phone);
         values.put(BookEntry.COLUMN_BOOK_QUANTITY, quantity);
+        Log.i("DAtaUri = ", String.valueOf(dataUri));
         if (dataUri != null) {
             int newRowID = getContentResolver().update(dataUri,
                     values,
                     null,
                     null);
             if (newRowID != -1) {
+                Log.i("Updated Row: ", String.valueOf(newRowID));
                 Toast.makeText(this, R.string.msg_item_changed, Toast.LENGTH_SHORT).show();
                 finish();
             } else {

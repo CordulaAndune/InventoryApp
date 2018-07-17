@@ -92,7 +92,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onStart();
     }
 
-
     /**
      * insert dummy data into database table books
      */
@@ -114,8 +113,10 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // show all columns from books table
-        String[] projection = new String[]{BookEntry._ID
-                , BookEntry.COLUMN_BOOK_NAME};
+        String[] projection = new String[]{BookEntry._ID,
+                BookEntry.COLUMN_BOOK_NAME,
+                BookEntry.COLUMN_BOOK_PRICE,
+                BookEntry.COLUMN_BOOK_QUANTITY};
 
         return new CursorLoader(this,
                 BookEntry.CONTENT_URI,
@@ -127,9 +128,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor != null) {
-            bookAdapter.swapCursor(cursor);
-        }
+        bookAdapter.swapCursor(cursor);
     }
 
     @Override

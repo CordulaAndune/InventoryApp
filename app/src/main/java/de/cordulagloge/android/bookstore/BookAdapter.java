@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Passing the binding operation to cursor loader
-        final Cursor cursor = getItem(position);
+        mCursorAdapter.getCursor().moveToPosition(position);
         mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
     }
 
@@ -68,7 +69,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     public void swapCursor(Cursor newCursor) {
         mCursorAdapter.swapCursor(newCursor);
-        this.notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public interface CustomOnItemClickListener {
@@ -76,27 +77,35 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView mNameTextView;
+        TextView mNameTextView,
+                mPriceTextView,
+                mQuantityTextView;
         View mParentView;
+        private long mId;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
             mNameTextView = itemView.findViewById(R.id.name_text_view);
+            mPriceTextView = itemView.findViewById(R.id.price_text_view);
+            mQuantityTextView = itemView.findViewById(R.id.quantity_text_view);
             mParentView = itemView;
             // TODO: databinding
         }
 
         public void bindCursor(final Cursor cursor, final CustomOnItemClickListener listener) {
-            String name = cursor.getString(cursor.getColumnIndex(BookEntry._ID));
-            mNameTextView.setText(name);
+            mNameTextView.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME)));
+            mPriceTextView.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE)));
+            mQuantityTextView.setText(cursor.getString(cursor.getColumnIndex(BookEntry._ID))); //cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY)));
+            mId = cursor.getLong(cursor.getColumnIndex(BookEntry._ID));
+            Log.i("MID:", String.valueOf(mId));
             mParentView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     RecyclerView root = (RecyclerView) view.getParent();
                     final int position = root.getChildLayoutPosition(mParentView);
-                    cursor.moveToPosition(position);
-                    listener.onItemClick(cursor.getLong(cursor.getColumnIndex(BookEntry._ID)));
+                    Log.i("MID:", String.valueOf(mId));
+                    listener.onItemClick(mId);
                 }
             });
         }

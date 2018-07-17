@@ -153,28 +153,67 @@ public class BookProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        SQLiteDatabase database = mBookDbHelper.getWritableDatabase();
+        int deletedRows;
+        switch (mUriMatcher.match(uri)) {
+            case BOOKS:
+                deletedRows = database.delete(BookEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+            case BOOKS_ID:
+                selection = BookEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                deletedRows = database.delete(BookEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Deletion not supported to unknown uri " + uri);
+        }
+        if (deletedRows != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return deletedRows;
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
-        if (contentValues != null) {
-            try {
-                makeSanityCheck(contentValues);
-                return updateBook(uri, contentValues, selection, selectionArgs);
-            } catch (IllegalArgumentException e) {
-                Log.e(LOG_TAG, "Invalid value: ", e);
-            }
+        int updatedRows;
+        if (contentValues.size() == 0) {
+            return -1;
+        }
+        switch (mUriMatcher.match(uri)) {
+            case BOOKS:
+                updatedRows = updateBook(contentValues, selection, selectionArgs);
+                break;
+            case BOOKS_ID:
+                selection = BookEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                updatedRows = updateBook(contentValues, selection, selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Pet with invalid uri " + uri + " could not be saved");
+        }
+        if (updatedRows != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+            return updatedRows;
         }
         return -1;
     }
 
-    private int updateBook(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
-        SQLiteDatabase database = mBookDbHelper.getWritableDatabase();
-        return database.update(BookEntry.TABLE_NAME,
-                contentValues,
-                selection,
-                selectionArgs);
+    private int updateBook(ContentValues contentValues, String selection, String[] selectionArgs) {
+        try {
+            makeSanityCheck(contentValues);
+            SQLiteDatabase database = mBookDbHelper.getWritableDatabase();
+            return database.update(BookEntry.TABLE_NAME,
+                    contentValues,
+                    selection,
+                    selectionArgs);
+        } catch (IllegalArgumentException e) {
+            Log.e(LOG_TAG, "Invalid value: ", e);
+        }
+        return 0;
     }
 }
