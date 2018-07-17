@@ -158,7 +158,23 @@ public class BookProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        if (contentValues != null) {
+            try {
+                makeSanityCheck(contentValues);
+                return updateBook(uri, contentValues, selection, selectionArgs);
+            } catch (IllegalArgumentException e) {
+                Log.e(LOG_TAG, "Invalid value: ", e);
+            }
+        }
+        return -1;
+    }
+
+    private int updateBook(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        SQLiteDatabase database = mBookDbHelper.getWritableDatabase();
+        return database.update(BookEntry.TABLE_NAME,
+                contentValues,
+                selection,
+                selectionArgs);
     }
 }
