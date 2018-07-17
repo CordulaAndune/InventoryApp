@@ -82,7 +82,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String name = binding.nameEditText.getText().toString().trim();
         String priceString = binding.priceEditText.getText().toString().trim().replace(",", ".");
         double price = 0;
-        if (TextUtils.isEmpty(priceString)) {
+        if (!TextUtils.isEmpty(priceString)) {
             price = Double.parseDouble(priceString);
         }
         String supplier = binding.supplierEditText.getText().toString().trim();
