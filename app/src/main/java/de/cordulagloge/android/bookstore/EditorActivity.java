@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -41,8 +42,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // get item uri if item should be changed
         Intent intent = getIntent();
         dataUri = intent.getData();
-        Log.i("DataUri", String.valueOf(dataUri));
-        binding.quantityEditText.setText("1");
+        // default quantity is 1
+        orderItem();
+        setQuantityCounter();
         setupTextWatcher();
         isItemChanged = false;
         if (dataUri != null) {
@@ -50,6 +52,60 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+    private void orderItem() {
+        if (binding.phoneEditText.getText() != null) {
+            binding.orderButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+        } else {
+
+        }
+    }
+
+    /**
+     * set up whole layout:
+     * Quantity to 1
+     * Decrement + increment button
+     */
+    private void setQuantityCounter() {
+        binding.quantityEditText.setText("1");
+        binding.decrementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String quantityString = binding.quantityEditText.getText().toString();
+                if (!TextUtils.isEmpty(quantityString)) {
+                    int quantity = Integer.parseInt(quantityString);
+                    // do not decrement to a negative value
+                    if (quantity >= 1) {
+                        quantity--;
+                        binding.quantityEditText.setText(String.valueOf(quantity));
+                    } else {
+                        Toast.makeText(EditorActivity.this, R.string.msg_quantity_not_decremented, Toast.LENGTH_SHORT).show();
+                        ;
+                    }
+                }
+            }
+        });
+        binding.incrementButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String quantityString = binding.quantityEditText.getText().toString();
+                if (!TextUtils.isEmpty(quantityString)) {
+                    int quantity = Integer.parseInt(quantityString);
+                    quantity++;
+                    binding.quantityEditText.setText(String.valueOf(quantity));
+                }
+            }
+        });
+    }
+
+    /**
+     * listen for text changes
+     */
     private void setupTextWatcher() {
         binding.nameEditText.addTextChangedListener(new CustomTextWatcher(binding.nameEditText));
         binding.priceEditText.addTextChangedListener(new CustomTextWatcher(binding.priceEditText));
@@ -69,7 +125,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.menu_delete_item:
-                deletePet();
+                deleteBook();
                 finish();
                 break;
             case R.id.menu_save_item:
@@ -82,7 +138,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         return super.onOptionsItemSelected(item);
     }
 
-    private void deletePet() {
+    /**
+     * Delete current shown item from database
+     */
+    private void deleteBook() {
         if (dataUri != null) {
             int deletedRows = getContentResolver().delete(dataUri, null, null);
             Log.i("Deleted ROws: ", String.valueOf(deletedRows));
@@ -94,6 +153,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+    /**
+     * save inserted data as new item or update existing
+     */
     private void savePet() {
         String name = binding.nameEditText.getText().toString().trim();
         String priceString = binding.priceEditText.getText().toString().trim().replace(",", ".");
@@ -108,6 +170,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (!TextUtils.isEmpty(quantityString)) {
             quantity = Integer.parseInt(quantityString);
         }
+        // if no name, supplier, phone and price is inserted, do not save item
         if (TextUtils.isEmpty(name) &&
                 TextUtils.isEmpty(supplier) &&
                 TextUtils.isEmpty(phone) &&
@@ -165,6 +228,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // show item data into UI
         if (cursor == null || cursor.getCount() < 1) {
+            // if cursor is empty, show empty EditorActivity
             return;
         } else {
             cursor.moveToFirst();

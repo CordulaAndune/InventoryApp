@@ -22,14 +22,16 @@ import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
 
     private Context mContext;
-    private CursorAdapter mCursorAdapter;
+    // private CursorAdapter mCursorAdapter;
+    private Cursor mCursor;
     private CustomOnItemClickListener mItemClickListener;
     private ViewHolder mViewHolder;
 
     public BookAdapter(Context context, Cursor cursor, CustomOnItemClickListener itemClickListener) {
         mContext = context;
         mItemClickListener = itemClickListener;
-        mCursorAdapter = new CursorAdapter(mContext, cursor, 0) {
+        mCursor = cursor;
+        /*mCursorAdapter = new CursorAdapter(mContext, cursor, 0) {
             @Override
             public View newView(Context context, Cursor cursor, ViewGroup parent) {
                 return LayoutInflater.from(context).inflate(R.layout.catalog_list_item, parent, false);
@@ -39,14 +41,27 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             public void bindView(View view, Context context, Cursor cursor) {
                 mViewHolder.bindCursor(cursor, mItemClickListener);
             }
-        };
+        };*/
     }
+
+    protected CursorAdapter mCursorAdapter = new CursorAdapter(mContext, mCursor, 0) {
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.catalog_list_item, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            mViewHolder.bindCursor(cursor, mItemClickListener);
+        }
+    };
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Passing the binding operation to cursor loader
         mCursorAdapter.getCursor().moveToPosition(position);
-        mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
+        Cursor cursor = mCursorAdapter.getCursor();
+        mCursorAdapter.bindView(null, mContext, cursor);
     }
 
     @NonNull
@@ -62,14 +77,30 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
         return (Cursor) mCursorAdapter.getItem(position);
     }
 
+
     @Override
     public int getItemCount() {
         return mCursorAdapter.getCount();
     }
 
+    /**
+     * change Cursor of CursorAdapter and notify to change list items
+     *
+     * @param newCursor
+     */
     public void swapCursor(Cursor newCursor) {
+        if (newCursor == mCursor) {
+            return;
+        }
+        mCursor = newCursor;
         mCursorAdapter.swapCursor(newCursor);
-        notifyDataSetChanged();
+        if (newCursor != null) {
+            // notify the observers about the new cursor
+            notifyDataSetChanged();
+        } else {
+            // notify the observers about the lack of a data set
+            notifyItemRangeRemoved(0, getItemCount());
+        }
     }
 
     public interface CustomOnItemClickListener {
@@ -90,13 +121,16 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
             mPriceTextView = itemView.findViewById(R.id.price_text_view);
             mQuantityTextView = itemView.findViewById(R.id.quantity_text_view);
             mParentView = itemView;
-            // TODO: databinding
         }
 
-        public void bindCursor(final Cursor cursor, final CustomOnItemClickListener listener) {
+        public void bindCursor(Cursor cursor, final CustomOnItemClickListener listener) {
+            mNameTextView.setText("");
+            mPriceTextView.setText("");
+            mQuantityTextView.setText(""); //cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY)));
+
             mNameTextView.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_NAME)));
             mPriceTextView.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_PRICE)));
-            mQuantityTextView.setText(cursor.getString(cursor.getColumnIndex(BookEntry._ID))); //cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY)));
+            mQuantityTextView.setText(String.valueOf(cursor.getLong(cursor.getColumnIndex(BookEntry._ID)))); //cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY)));
             mId = cursor.getLong(cursor.getColumnIndex(BookEntry._ID));
             Log.i("MID:", String.valueOf(mId));
             mParentView.setOnClickListener(new View.OnClickListener() {
@@ -104,8 +138,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.ViewHolder> {
                 public void onClick(View view) {
                     RecyclerView root = (RecyclerView) view.getParent();
                     final int position = root.getChildLayoutPosition(mParentView);
-                    Log.i("MID:", String.valueOf(mId));
-                    listener.onItemClick(mId);
+                    Cursor cursor = (Cursor) mCursorAdapter.getItem(position);
+                    Log.i("MID:", String.valueOf(cursor.getLong(cursor.getColumnIndex(BookEntry._ID))));
+                    listener.onItemClick(cursor.getLong(cursor.getColumnIndex(BookEntry._ID)));
                 }
             });
         }

@@ -60,6 +60,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         binding.inventoryList.setAdapter(bookAdapter);
     }
 
+    /**
+     * use floating action button to open editorActivity for adding new item
+     */
     private void setAddButton() {
         binding.addButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,6 +82,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete_all_item:
+                // testing
                 insertDummyBook();
                 break;
             case R.id.menu_delete_sold_out:
@@ -128,6 +132,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        // change Cursor
         bookAdapter.swapCursor(cursor);
     }
 
