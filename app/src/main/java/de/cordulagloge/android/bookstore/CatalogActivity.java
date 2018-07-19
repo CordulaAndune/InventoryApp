@@ -8,14 +8,14 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 
 import de.cordulagloge.android.bookstore.data.BookProvider;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
@@ -28,7 +28,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     private static final int INVENTORY_LOADER = 0;
     private BookProvider mBookProvider;
     private ActivityCatalogBinding binding;
-    private RecyclerView bookList;
     private BookAdapter bookAdapter;
 
 
@@ -37,27 +36,62 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         mBookProvider = new BookProvider();
-        setRecyclerView();
+        setListView();
         setAddButton();
         getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
     }
 
     /**
-     * Set up RecyclerView with horizontal dividers and {@link #bookAdapter}
+     * Set up Listview and {@link #bookAdapter}
      * onItemClick: open EditorActivity for clicked item
      */
-    private void setRecyclerView() {
-        bookAdapter = new BookAdapter(this, null, new BookAdapter.CustomOnItemClickListener() {
+    private void setListView() {
+        bookAdapter = new BookAdapter(this, null, 0);
+        binding.inventoryList.setAdapter(bookAdapter);
+        binding.inventoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(long id) {
-                Intent editorIntent = new Intent(CatalogActivity.this, EditorActivity.class);
-                editorIntent.setData(ContentUris.withAppendedId(BookEntry.CONTENT_URI, id));
-                startActivity(editorIntent);
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                if (view.getId() == R.id.sell_button) {
+                    Log.i(LOG_TAG, "Button click registered.");
+                    sellItem(id);
+                } else {
+                    Log.i(LOG_TAG, "Item click registered.");
+                    Intent editorIntent = new Intent(CatalogActivity.this, EditorActivity.class);
+                    editorIntent.setData(ContentUris.withAppendedId(BookEntry.CONTENT_URI, id));
+                    startActivity(editorIntent);
+                }
             }
         });
-        binding.inventoryList.setLayoutManager(new LinearLayoutManager(this));
-        binding.inventoryList.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        binding.inventoryList.setAdapter(bookAdapter);
+    }
+
+    public void sellItem(long id) {
+        Uri uri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, id);
+        Cursor cursor = null;
+        try {
+            cursor = getContentResolver().query(uri,
+                    new String[]{BookEntry.COLUMN_BOOK_QUANTITY},
+                    null,
+                    null,
+                    null);
+            int quantity = cursor.getInt(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY));
+            quantity++;
+            Log.i(LOG_TAG, "new quantity:" + String.valueOf(quantity));
+            ContentValues values = new ContentValues();
+            values.put(BookEntry.COLUMN_BOOK_QUANTITY, quantity);
+            getContentResolver().update(uri,
+                    values,
+                    null,
+                    null);
+            if (getLoaderManager().getLoader(INVENTORY_LOADER) == null){
+                getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
+            } else {
+                getLoaderManager().restartLoader(INVENTORY_LOADER, null, this);
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     /**

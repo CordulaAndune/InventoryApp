@@ -52,6 +52,7 @@
             app:layout_constraintLeft_toRightOf="@id/quantity_text_view"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:focusable="false"
             tools:text="Sell" />
 
     </android.support.constraint.ConstraintLayout>
