@@ -8,7 +8,6 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -34,6 +33,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private Uri dataUri;
     private boolean isItemChanged;
     private final static int DATA_LOADER = 0;
+    private final static String LOG_TAG = EditorActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +52,27 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+    /**
+     * order Items by phone if supplier phone nr is available
+     */
     private void orderItem() {
-        if (binding.phoneEditText.getText() != null) {
+        final String phoneNr = binding.phoneEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(phoneNr) && phoneNr.length() > 0) {
+            binding.orderButton.setEnabled(true);
             binding.orderButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-
+                    Intent phoneIntent = new Intent();
+                    phoneIntent.setType(Intent.ACTION_DIAL);
+                    phoneIntent.setData(Uri.parse("tel:" + phoneNr));
+                    if(phoneIntent.resolveActivity(getPackageManager()) != null){
+                        startActivity(phoneIntent);
+                    }
                 }
             });
         } else {
-
+            binding.orderButton.setEnabled(false);
         }
     }
 
@@ -278,6 +288,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 case R.id.supplier_edit_text:
                     break;
                 case R.id.phone_edit_text:
+                    orderItem();
                     break;
                 case R.id.quantity_edit_text:
                     break;
