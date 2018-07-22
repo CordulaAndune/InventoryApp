@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import de.cordulagloge.android.bookstore.databinding.ActivityEditorBinding;
@@ -57,7 +58,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     private void orderItem() {
         final String phoneNr = binding.phoneEditText.getText().toString().trim();
-        if (TextUtils.isEmpty(phoneNr) && phoneNr.length() > 0) {
+        Log.i(LOG_TAG, "text: " + phoneNr);
+        if (phoneNr.length() > 0) {
             binding.orderButton.setEnabled(true);
             binding.orderButton.setOnClickListener(new View.OnClickListener() {
 
@@ -279,6 +281,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         @Override
         public void afterTextChanged(Editable editable) {
+            Log.i(LOG_TAG, "Text changed.");
             isItemChanged = true;
             switch (mView.getId()) {
                 case R.id.name_edit_text:
@@ -288,6 +291,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 case R.id.supplier_edit_text:
                     break;
                 case R.id.phone_edit_text:
+                    EditText editTExt = (EditText) mView;
+                    Log.i(LOG_TAG, "Text: " + editTExt.getText().toString());
                     orderItem();
                     break;
                 case R.id.quantity_edit_text:
