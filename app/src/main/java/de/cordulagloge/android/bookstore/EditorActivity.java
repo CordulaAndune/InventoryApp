@@ -9,7 +9,9 @@ import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -43,13 +45,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // get item uri if item should be changed
         Intent intent = getIntent();
         dataUri = intent.getData();
+        setToolbar();
         // default quantity is 1
         orderItem();
         setQuantityCounter();
-        setupTextWatcher();
         isItemChanged = false;
         if (dataUri != null) {
             getLoaderManager().initLoader(DATA_LOADER, null, this);
+        }
+        setupTextWatcher();
+    }
+
+    private void setToolbar() {
+        setSupportActionBar((Toolbar) binding.toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
@@ -58,7 +69,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     private void orderItem() {
         final String phoneNr = binding.phoneEditText.getText().toString().trim();
-        Log.i(LOG_TAG, "text: " + phoneNr);
         if (phoneNr.length() > 0) {
             binding.orderButton.setEnabled(true);
             binding.orderButton.setOnClickListener(new View.OnClickListener() {
@@ -281,7 +291,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         @Override
         public void afterTextChanged(Editable editable) {
-            Log.i(LOG_TAG, "Text changed.");
             isItemChanged = true;
             switch (mView.getId()) {
                 case R.id.name_edit_text:
@@ -291,8 +300,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 case R.id.supplier_edit_text:
                     break;
                 case R.id.phone_edit_text:
-                    EditText editTExt = (EditText) mView;
-                    Log.i(LOG_TAG, "Text: " + editTExt.getText().toString());
                     orderItem();
                     break;
                 case R.id.quantity_edit_text:

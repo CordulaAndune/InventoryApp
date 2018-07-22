@@ -11,6 +11,7 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,9 +37,14 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         mBookProvider = new BookProvider();
+        setToolbar();
         setListView();
         setAddButton();
         getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
+    }
+
+    private void setToolbar() {
+        setSupportActionBar((Toolbar) binding.toolbar);
     }
 
     /**
