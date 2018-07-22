@@ -65,33 +65,11 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     }
 
     public void sellItem(long id) {
-        Uri uri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, id);
-        Cursor cursor = null;
-        try {
-            cursor = getContentResolver().query(uri,
-                    new String[]{BookEntry.COLUMN_BOOK_QUANTITY},
-                    null,
-                    null,
-                    null);
-            int quantity = cursor.getInt(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY));
-            quantity++;
-            Log.i(LOG_TAG, "new quantity:" + String.valueOf(quantity));
-            ContentValues values = new ContentValues();
-            values.put(BookEntry.COLUMN_BOOK_QUANTITY, quantity);
-            getContentResolver().update(uri,
-                    values,
-                    null,
-                    null);
             if (getLoaderManager().getLoader(INVENTORY_LOADER) == null){
                 getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
             } else {
                 getLoaderManager().restartLoader(INVENTORY_LOADER, null, this);
             }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
     /**
