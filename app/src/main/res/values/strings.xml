@@ -17,4 +17,7 @@
     <string name="msg_quantity_not_decremented">Quantity must be positive or 0.</string>
     <string name="button_order_item">Order Item</string>
     <string name="buton_sell">Sell</string>
+    <string name="msg_discard_unsaved">Discard unsaved changes?</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 </resources>

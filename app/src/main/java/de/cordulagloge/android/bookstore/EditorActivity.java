@@ -1,14 +1,17 @@
 package de.cordulagloge.android.bookstore;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,7 +22,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import de.cordulagloge.android.bookstore.databinding.ActivityEditorBinding;
@@ -47,13 +49,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         dataUri = intent.getData();
         setToolbar();
         // default quantity is 1
-        orderItem();
         setQuantityCounter();
         isItemChanged = false;
         if (dataUri != null) {
             getLoaderManager().initLoader(DATA_LOADER, null, this);
         }
-        setupTextWatcher();
     }
 
     private void setToolbar() {
@@ -78,7 +78,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     Intent phoneIntent = new Intent();
                     phoneIntent.setType(Intent.ACTION_DIAL);
                     phoneIntent.setData(Uri.parse("tel:" + phoneNr));
-                    if(phoneIntent.resolveActivity(getPackageManager()) != null){
+                    if (phoneIntent.resolveActivity(getPackageManager()) != null) {
                         startActivity(phoneIntent);
                     }
                 }
@@ -156,8 +156,52 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.menu_settings:
                 //TODO:settings open
                 break;
+            case android.R.id.home:
+                if (isItemChanged) {
+                    showUnsavedDialog(new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                        }
+                    });
+                } else {
+                    NavUtils.navigateUpFromSameTask(EditorActivity.this);
+                }
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isItemChanged) {
+            showUnsavedDialog(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    /**
+     * Ask if unsaved changes should be discarded
+     *
+     * @param positiveListener DialogInterface.OnClickListener for positive button
+     */
+    private void showUnsavedDialog(DialogInterface.OnClickListener positiveListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.msg_discard_unsaved);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.ok, positiveListener);
+        builder.create().show();
     }
 
     /**
@@ -260,6 +304,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             binding.phoneEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE)));
             binding.quantityEditText.setText(cursor.getString(cursor.getColumnIndex(BookEntry.COLUMN_BOOK_QUANTITY)));
         }
+        setupTextWatcher();
+        orderItem();
     }
 
     @Override
