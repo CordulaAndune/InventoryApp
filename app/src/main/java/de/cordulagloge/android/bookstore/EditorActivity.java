@@ -53,6 +53,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         isItemChanged = false;
         if (dataUri != null) {
             getLoaderManager().initLoader(DATA_LOADER, null, this);
+        } else {
+            orderItem();
+            setupTextWatcher();
         }
     }
 
@@ -224,7 +227,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Confirm deletion of item
      */
-    private void confirmDeletion(){
+    private void confirmDeletion() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_delete_item);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
