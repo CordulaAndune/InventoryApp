@@ -56,6 +56,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     }
 
+    /**
+     * set Toolbar as actionbar and add up button
+     */
     private void setToolbar() {
         setSupportActionBar((Toolbar) binding.toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -147,8 +150,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.menu_delete_item:
-                deleteBook();
-                finish();
+                confirmDeletion();
                 break;
             case R.id.menu_save_item:
                 savePet();
@@ -210,13 +212,34 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void deleteBook() {
         if (dataUri != null) {
             int deletedRows = getContentResolver().delete(dataUri, null, null);
-            Log.i("Deleted ROws: ", String.valueOf(deletedRows));
             if (deletedRows != -1) {
                 Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Item not deleted", Toast.LENGTH_SHORT).show();
             }
         }
+        finish();
+    }
+
+    /**
+     * Confirm deletion of item
+     */
+    private void confirmDeletion(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.msg_delete_item);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                deleteBook();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.create().show();
     }
 
     /**
@@ -250,7 +273,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
         values.put(BookEntry.COLUMN_BOOK_SUPPLIER_PHONE, phone);
         values.put(BookEntry.COLUMN_BOOK_QUANTITY, quantity);
-        Log.i("DAtaUri = ", String.valueOf(dataUri));
+        // if dataUri is avaiable, item exists already and have to be updated
         if (dataUri != null) {
             int newRowID = getContentResolver().update(dataUri,
                     values,
@@ -263,6 +286,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             } else {
                 Toast.makeText(this, R.string.msg_item_not_changed, Toast.LENGTH_SHORT).show();
             }
+            // else a new item should be inserted into database
         } else {
             Uri newRowUri = getContentResolver().insert(BookEntry.CONTENT_URI, values);
             if (newRowUri != null) {
@@ -317,6 +341,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         binding.quantityEditText.setText("1");
     }
 
+    /**
+     * TextWatcher for all EditText views to register if data was changed
+     */
     private class CustomTextWatcher implements TextWatcher {
 
         private View mView;
@@ -346,6 +373,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 case R.id.supplier_edit_text:
                     break;
                 case R.id.phone_edit_text:
+                    // if phone number was changed, check if order button have to be enabled/disabled
                     orderItem();
                     break;
                 case R.id.quantity_edit_text:
