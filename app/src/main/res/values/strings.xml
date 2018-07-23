@@ -21,4 +21,6 @@
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
     <string name="msg_delete_item">Delete item?</string>
+    <string name="msg_delete_all_items">Delete all items?</string>
+    <string name="msg_delete_sold_out">Delete all sold out items?</string>
 </resources>

@@ -1,9 +1,10 @@
 package de.cordulagloge.android.bookstore;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -83,36 +84,68 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete_all_item:
-                // testing
-                insertDummyBook();
+                deleteAllItems();
                 break;
             case R.id.menu_delete_sold_out:
+                deleteSoldOutItems();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    /**
+     * delete all items in database:
+     * show dialog to confirm deletion
+     */
+    private void deleteAllItems() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.msg_delete_all_items);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                getContentResolver().delete(BookEntry.CONTENT_URI,
+                        null,
+                        null);
+            }
+        });
+        builder.create().show();
     }
 
     /**
-     * insert dummy data into database table books
+     * delete sold out items (quantity == 0):
+     * show AlertDialog for confirmation
      */
-    private void insertDummyBook() {
-        // set dummy data
-        String bookName = "The Hobbit";
-        double bookPrice = 1;
-        int bookQuantity = 2;
-        String supplier = "bookstore.com";
-        ContentValues values = new ContentValues();
-        values.put(BookEntry.COLUMN_BOOK_NAME, bookName);
-        values.put(BookEntry.COLUMN_BOOK_PRICE, bookPrice);
-        values.put(BookEntry.COLUMN_BOOK_QUANTITY, bookQuantity);
-        values.put(BookEntry.COLUMN_BOOK_SUPPLIER, supplier);
-        // insert data into books table
-        getContentResolver().insert(BookEntry.CONTENT_URI, values);
+    private void deleteSoldOutItems(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.msg_delete_sold_out);
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String selection = BookEntry.COLUMN_BOOK_QUANTITY + "=?";
+                String[] selectionArgs = new String[] {"0"};
+                getContentResolver().delete(BookEntry.CONTENT_URI,
+                        selection,
+                        selectionArgs);
+            }
+        });
+        builder.create().show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
