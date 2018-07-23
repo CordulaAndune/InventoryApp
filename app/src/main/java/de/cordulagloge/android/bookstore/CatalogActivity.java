@@ -8,11 +8,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +28,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     private BookProvider mBookProvider;
     private ActivityCatalogBinding binding;
     private BookAdapter bookAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,25 +54,11 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         binding.inventoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                if (view.getId() == R.id.sell_button) {
-                    Log.i(LOG_TAG, "Button click registered.");
-                    sellItem(id);
-                } else {
-                    Log.i(LOG_TAG, "Item click registered.");
-                    Intent editorIntent = new Intent(CatalogActivity.this, EditorActivity.class);
-                    editorIntent.setData(ContentUris.withAppendedId(BookEntry.CONTENT_URI, id));
-                    startActivity(editorIntent);
-                }
+                Intent editorIntent = new Intent(CatalogActivity.this, EditorActivity.class);
+                editorIntent.setData(ContentUris.withAppendedId(BookEntry.CONTENT_URI, id));
+                startActivity(editorIntent);
             }
         });
-    }
-
-    public void sellItem(long id) {
-            if (getLoaderManager().getLoader(INVENTORY_LOADER) == null){
-                getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
-            } else {
-                getLoaderManager().restartLoader(INVENTORY_LOADER, null, this);
-            }
     }
 
     /**
