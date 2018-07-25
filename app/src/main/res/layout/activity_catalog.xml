@@ -3,13 +3,16 @@
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/catalog_root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".CatalogActivity">
 
         <include
             android:id="@+id/toolbar"
-            layout="@layout/toolbar_layout" />
+            layout="@layout/toolbar_layout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/inventory_list"/>
 
         <ListView
             android:id="@+id/inventory_list"
@@ -27,6 +30,32 @@
             android:src="@drawable/ic_add_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/empty_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_16"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/toolbar">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/cardboard" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/empty_text"
+                android:textAppearance="?android:textAppearanceLarge" />
+
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

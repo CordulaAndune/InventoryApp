@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 
 import de.cordulagloge.android.bookstore.data.BookProvider;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
+import de.cordulagloge.android.bookstore.databinding.CatalogListHeaderBinding;
 
 import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 
@@ -60,6 +61,12 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 startActivity(editorIntent);
             }
         });
+        binding.inventoryList.setEmptyView(binding.emptyLayout);
+        CatalogListHeaderBinding headerBinding = DataBindingUtil.inflate(getLayoutInflater(),
+                R.layout.catalog_list_header,
+                binding.catalogRootLayout,
+                false);
+        binding.inventoryList.addHeaderView(headerBinding.getRoot());
     }
 
     /**
@@ -121,7 +128,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
      * delete sold out items (quantity == 0):
      * show AlertDialog for confirmation
      */
-    private void deleteSoldOutItems(){
+    private void deleteSoldOutItems() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.msg_delete_sold_out);
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -134,7 +141,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String selection = BookEntry.COLUMN_BOOK_QUANTITY + "=?";
-                String[] selectionArgs = new String[] {"0"};
+                String[] selectionArgs = new String[]{"0"};
                 getContentResolver().delete(BookEntry.CONTENT_URI,
                         selection,
                         selectionArgs);
