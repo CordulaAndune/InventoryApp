@@ -67,6 +67,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            // set Title
+            if (dataUri == null) {
+                actionBar.setTitle(R.string.title_new_item);
+            } else {
+                actionBar.setTitle(R.string.title_edit_item);
+            }
         }
     }
 
