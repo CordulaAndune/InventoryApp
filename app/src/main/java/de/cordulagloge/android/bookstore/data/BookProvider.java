@@ -32,9 +32,6 @@ public class BookProvider extends ContentProvider {
         mUriMatcher.addURI(CONTENT_AUTHORITY, BOOK_PATH + "/#", BOOKS_ID);
     }
 
-    // Database name and version number
-    private final String DB_NAME = "books.db";
-    private final int DB_VERSION = 1;
     private BookDbHelper mBookDbHelper;
 
     /**
@@ -44,6 +41,8 @@ public class BookProvider extends ContentProvider {
      */
     @Override
     public boolean onCreate() {
+        int DB_VERSION = 1;
+        String DB_NAME = "books.db";
         mBookDbHelper = new BookDbHelper(getContext(), DB_NAME, DB_VERSION);
         return true;
     }
@@ -116,6 +115,13 @@ public class BookProvider extends ContentProvider {
         }
     }
 
+    /**
+     * insert new item into database
+     *
+     * @param uri           content uri of the database
+     * @param contentValues for the insertion
+     * @return uri of the inserted item
+     */
     private Uri insertBook(Uri uri, ContentValues contentValues) {
         SQLiteDatabase database = mBookDbHelper.getWritableDatabase();
         long newRowID = database.insert(BookEntry.TABLE_NAME,
@@ -128,6 +134,12 @@ public class BookProvider extends ContentProvider {
         }
     }
 
+    /**
+     * check if values are correct for insertion / updating
+     *
+     * @param contentValues which should be inserted in the database
+     * @throws IllegalArgumentException if values are invalid
+     */
     private void makeSanityCheck(ContentValues contentValues) throws IllegalArgumentException {
         // check if product name is not null and valid
         if (contentValues.containsKey(BookEntry.COLUMN_BOOK_NAME)) {
@@ -203,6 +215,14 @@ public class BookProvider extends ContentProvider {
         return -2;
     }
 
+    /**
+     * Update existing item in database
+     *
+     * @param contentValues which should be updated
+     * @param selection     column name
+     * @param selectionArgs value which row should have which should be updated
+     * @return row number
+     */
     private int updateBook(ContentValues contentValues, String selection, String[] selectionArgs) {
         try {
             makeSanityCheck(contentValues);

@@ -11,8 +11,8 @@
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar_layout"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/inventory_list"/>
+            app:layout_constraintBottom_toTopOf="@id/inventory_list"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ListView
             android:id="@+id/inventory_list"

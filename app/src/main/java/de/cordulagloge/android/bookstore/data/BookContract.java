@@ -36,31 +36,21 @@ public final class BookContract {
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
                 + "/" + CONTENT_AUTHORITY + "/" + BOOK_PATH;
 
-
-        // name of the databse
+        // name of the database
         public final static String TABLE_NAME = "books";
 
         // column names
         // _id: unique and autoincrement
         public final static String _ID = BaseColumns._ID;
-
         // product name: text, non null
         public final static String COLUMN_BOOK_NAME = "product_name";
-
         // price of the product: text, non null
         public final static String COLUMN_BOOK_PRICE = "price";
-
         // quantity in store: integer, non null, default 1
         public final static String COLUMN_BOOK_QUANTITY = "quantity";
-
         // supplier of product: Text
         public final static String COLUMN_BOOK_SUPPLIER = "supplier";
-
         // suppliers phone number: text
         public final static String COLUMN_BOOK_SUPPLIER_PHONE = "phone";
-
-
     }
-
-
 }

@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 
-import de.cordulagloge.android.bookstore.data.BookProvider;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
 import de.cordulagloge.android.bookstore.databinding.CatalogListHeaderBinding;
 
@@ -27,7 +26,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     private static final String LOG_TAG = CatalogActivity.class.getName();
     private static final int INVENTORY_LOADER = 0;
-    private BookProvider mBookProvider;
     private ActivityCatalogBinding binding;
     private BookAdapter bookAdapter;
 
@@ -35,19 +33,21 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
-        mBookProvider = new BookProvider();
         setToolbar();
         setListView();
         setAddButton();
         getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
     }
 
+    /**
+     * set Toolbar as actionbar
+     */
     private void setToolbar() {
         setSupportActionBar((Toolbar) binding.toolbar);
     }
 
     /**
-     * Set up Listview and {@link #bookAdapter}
+     * Set Listview and {@link #bookAdapter}
      * onItemClick: open EditorActivity for clicked item
      */
     private void setListView() {
@@ -94,6 +94,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 deleteAllItems();
                 break;
             case R.id.menu_delete_sold_out:
+                // delete items with quantity == 0
                 deleteSoldOutItems();
                 break;
         }
@@ -102,7 +103,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     /**
      * delete all items in database:
-     * show dialog to confirm deletion
+     * show dialog to confirm deletion, negative button: close dialog, positive button: delete items
      */
     private void deleteAllItems() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -126,7 +127,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     /**
      * delete sold out items (quantity == 0):
-     * show AlertDialog for confirmation
+     * show AlertDialog for confirmation, negative button: close item, positive button: delete sold out items
      */
     private void deleteSoldOutItems() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

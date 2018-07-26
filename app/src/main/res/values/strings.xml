@@ -19,13 +19,13 @@
     <string name="buton_sell">Sell</string>
     <string name="msg_discard_unsaved">Discard unsaved changes?</string>
     <string name="cancel">Cancel</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="msg_delete_item">Delete item?</string>
     <string name="msg_delete_all_items">Delete all items?</string>
     <string name="msg_delete_sold_out">Delete all sold out items?</string>
     <string name="title_new_item">Add new item</string>
     <string name="title_edit_item">Edit item</string>
-    <string name="empty_text">No items found... \nStart with adding a new item</string>
+    <string name="empty_text">No items found… \nStart with adding a new item</string>
     <string name="header_product">Product</string>
     <string name="header_price">Price</string>
     <string name="header_quantity">Quantity</string>
@@ -33,4 +33,6 @@
     <string name="mag_valid_price">Please enter a valid price</string>
     <string name="msg_valid_name">Please enter a valid name</string>
     <string name="button_order">Order</string>
+    <string name="button_minus">-</string>
+    <string name="button_plus">+</string>
 </resources>

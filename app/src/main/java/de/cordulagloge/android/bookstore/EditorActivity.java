@@ -47,7 +47,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         Intent intent = getIntent();
         dataUri = intent.getData();
         setToolbar();
-        // default quantity is 1
         setQuantityCounter();
         isItemChanged = false;
         if (dataUri != null) {
@@ -168,6 +167,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 break;
             case android.R.id.home:
                 if (isItemChanged) {
+                    // show dialog if data was changed but not saved
                     showUnsavedDialog(new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -185,6 +185,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onBackPressed() {
         if (isItemChanged) {
+            // show dialog if data was changed but not saved
             showUnsavedDialog(new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -254,6 +255,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * save inserted data as new item or update existing
      */
     private boolean savePet() {
+        // get values
         String name = binding.nameEditText.getText().toString().trim();
         if (TextUtils.isEmpty(name)) {
             Toast.makeText(this, R.string.msg_valid_name, Toast.LENGTH_SHORT).show();
