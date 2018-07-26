@@ -146,7 +146,7 @@ public class BookProvider extends ContentProvider {
         // check if price is not null and positive
         if (contentValues.containsKey(BookEntry.COLUMN_BOOK_PRICE)) {
             double price = contentValues.getAsDouble(BookEntry.COLUMN_BOOK_PRICE);
-            if (price < 0) {
+            if (price <= 0) {
                 throw new IllegalArgumentException("Price has to be a positive value");
             }
         }
@@ -200,7 +200,7 @@ public class BookProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
             return updatedRows;
         }
-        return -1;
+        return -2;
     }
 
     private int updateBook(ContentValues contentValues, String selection, String[] selectionArgs) {

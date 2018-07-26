@@ -256,10 +256,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     private void savePet() {
         String name = binding.nameEditText.getText().toString().trim();
+        if(TextUtils.isEmpty(name)){
+            Toast.makeText(this, R.string.msg_valid_name, Toast.LENGTH_SHORT).show();
+            return;
+        }
         String priceString = binding.priceEditText.getText().toString().trim().replace(",", ".");
         double price = 0;
         if (!TextUtils.isEmpty(priceString)) {
             price = Double.parseDouble(priceString);
+        } else {
+            Toast.makeText(this, R.string.mag_valid_price, Toast.LENGTH_SHORT).show();
+            return;
         }
         String supplier = binding.supplierEditText.getText().toString().trim();
         String phone = binding.phoneEditText.getText().toString().trim();
@@ -273,6 +280,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 TextUtils.isEmpty(supplier) &&
                 TextUtils.isEmpty(phone) &&
                 price == 0) {
+            Toast.makeText(this, R.string.msg_enter_name, Toast.LENGTH_SHORT).show();
             return;
         }
         // ContentValues
