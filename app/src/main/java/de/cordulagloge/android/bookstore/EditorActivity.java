@@ -18,7 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -87,6 +86,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
                 @Override
                 public void onClick(View view) {
+                    savePet();
                     Intent phoneIntent = new Intent();
                     phoneIntent.setType(Intent.ACTION_DIAL);
                     phoneIntent.setData(Uri.parse("tel:" + phoneNr));
@@ -162,10 +162,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 confirmDeletion();
                 break;
             case R.id.menu_save_item:
-                savePet();
-                break;
-            case R.id.menu_settings:
-                //TODO:settings open
+                if (savePet()) {
+                    finish();
+                }
                 break;
             case android.R.id.home:
                 if (isItemChanged) {
@@ -254,11 +253,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * save inserted data as new item or update existing
      */
-    private void savePet() {
+    private boolean savePet() {
         String name = binding.nameEditText.getText().toString().trim();
-        if(TextUtils.isEmpty(name)){
+        if (TextUtils.isEmpty(name)) {
             Toast.makeText(this, R.string.msg_valid_name, Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         String priceString = binding.priceEditText.getText().toString().trim().replace(",", ".");
         double price = 0;
@@ -266,7 +265,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             price = Double.parseDouble(priceString);
         } else {
             Toast.makeText(this, R.string.mag_valid_price, Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         String supplier = binding.supplierEditText.getText().toString().trim();
         String phone = binding.phoneEditText.getText().toString().trim();
@@ -281,7 +280,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 TextUtils.isEmpty(phone) &&
                 price == 0) {
             Toast.makeText(this, R.string.msg_enter_name, Toast.LENGTH_SHORT).show();
-            return;
+            return false;
         }
         // ContentValues
         ContentValues values = new ContentValues();
@@ -297,23 +296,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     null,
                     null);
             if (newRowID != -1) {
-                Log.i("Updated Row: ", String.valueOf(newRowID));
+                isItemChanged = false;
                 Toast.makeText(this, R.string.msg_item_changed, Toast.LENGTH_SHORT).show();
-                finish();
+                return true;
             } else {
                 Toast.makeText(this, R.string.msg_item_not_changed, Toast.LENGTH_SHORT).show();
+                return false;
             }
             // else a new item should be inserted into database
         } else {
             Uri newRowUri = getContentResolver().insert(BookEntry.CONTENT_URI, values);
             if (newRowUri != null) {
+                isItemChanged = false;
                 Toast.makeText(this, R.string.msg_item_saved, Toast.LENGTH_SHORT).show();
-                finish();
+                return true;
             } else {
                 Toast.makeText(this, R.string.msg_item_not_saved, Toast.LENGTH_SHORT).show();
+                return false;
             }
         }
-
     }
 
     @Override
