@@ -9,16 +9,10 @@ import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 /**
  * Created by Cordula Gloge on 20/06/2018
  */
-public class BookDbHelper extends SQLiteOpenHelper {
-
-    private String databaseName;
-    private int versionNumber;
-    private final String LOG_TAG = BookDbHelper.class.getName();
+class BookDbHelper extends SQLiteOpenHelper {
 
     public BookDbHelper(Context context, String name, int version) {
         super(context, name, null, version);
-        databaseName = name;
-        versionNumber = version;
     }
 
     @Override

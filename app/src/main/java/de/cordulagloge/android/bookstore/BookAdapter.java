@@ -25,8 +25,7 @@ import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
  */
 public class BookAdapter extends CursorAdapter {
 
-    private static final String LOG_TAG = BookAdapter.class.getName();
-    private Context mContext;
+    private final Context mContext;
     private Uri mUri;
 
     public BookAdapter(Context context, Cursor cursor, int flags) {

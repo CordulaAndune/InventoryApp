@@ -37,7 +37,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private Uri dataUri;
     private boolean isItemChanged;
     private final static int DATA_LOADER = 0;
-    private final static String LOG_TAG = EditorActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +84,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
                 @Override
                 public void onClick(View view) {
-                    savePet();
+                    saveItem();
                     Intent phoneIntent = new Intent();
                     phoneIntent.setType(Intent.ACTION_DIAL);
                     phoneIntent.setData(Uri.parse("tel:" + phoneNr));
@@ -118,7 +117,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         binding.quantityEditText.setText(String.valueOf(quantity));
                     } else {
                         Toast.makeText(EditorActivity.this, R.string.msg_quantity_not_decremented, Toast.LENGTH_SHORT).show();
-                        ;
                     }
                 }
             }
@@ -161,7 +159,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 confirmDeletion();
                 break;
             case R.id.menu_save_item:
-                if (savePet()) {
+                if (saveItem()) {
                     finish();
                 }
                 break;
@@ -218,7 +216,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Delete current shown item from database
      */
-    private void deleteBook() {
+    private void deleteItem() {
         if (dataUri != null) {
             int deletedRows = getContentResolver().delete(dataUri, null, null);
             if (deletedRows != -1) {
@@ -239,7 +237,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                deleteBook();
+                deleteItem();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -254,7 +252,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * save inserted data as new item or update existing
      */
-    private boolean savePet() {
+    private boolean saveItem() {
         // get values
         String name = binding.nameEditText.getText().toString().trim();
         if (TextUtils.isEmpty(name)) {
@@ -262,7 +260,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return false;
         }
         String priceString = binding.priceEditText.getText().toString().trim().replace(",", ".");
-        double price = 0;
+        double price;
         if (!TextUtils.isEmpty(priceString)) {
             price = Double.parseDouble(priceString);
         } else {
@@ -366,7 +364,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     private class CustomTextWatcher implements TextWatcher {
 
-        private View mView;
+        private final View mView;
 
         public CustomTextWatcher(View view) {
             mView = view;

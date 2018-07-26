@@ -46,7 +46,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/cardboard" />
+                android:src="@drawable/cardboard"
+                android:contentDescription="@string/desc_empty_cardboard"/>
 
             <TextView
                 android:layout_width="wrap_content"

@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
 public final class BookContract {
 
     public final static String CONTENT_AUTHORITY = "de.cordulagloge.android.bookstore";
-    public final static String CONTENT_SCHEMA = "content://";
+    private final static String CONTENT_SCHEMA = "content://";
     public final static String BOOK_PATH = "books";
 
     private BookContract() {

@@ -24,7 +24,6 @@ import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
 
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String LOG_TAG = CatalogActivity.class.getName();
     private static final int INVENTORY_LOADER = 0;
     private ActivityCatalogBinding binding;
     private BookAdapter bookAdapter;
@@ -149,11 +148,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             }
         });
         builder.create().show();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
