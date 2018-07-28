@@ -63,7 +63,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         binding.inventoryList.setEmptyView(binding.emptyLayout);
         CatalogListHeaderBinding headerBinding = DataBindingUtil.inflate(getLayoutInflater(),
                 R.layout.catalog_list_header,
-                binding.catalogRootLayout,
+                binding.inventoryList,
                 false);
         binding.inventoryList.addHeaderView(headerBinding.getRoot(), null, false);
     }
