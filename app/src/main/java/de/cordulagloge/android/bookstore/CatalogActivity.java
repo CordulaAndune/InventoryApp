@@ -65,7 +65,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 R.layout.catalog_list_header,
                 binding.catalogRootLayout,
                 false);
-        binding.inventoryList.addHeaderView(headerBinding.getRoot());
+        binding.inventoryList.addHeaderView(headerBinding.getRoot(), null, false);
     }
 
     /**
