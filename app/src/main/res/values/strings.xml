@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Book Store</string>
+    <string name="app_name">Inventory List</string>
     <string name="menu_delete_all_items">Delete all items</string>
     <string name="menu_delete_sold_out_items">Delete sold out items</string>
     <string name="label_product_name">Product name</string>
@@ -35,4 +35,7 @@
     <string name="button_plus">+</string>
     <string name="desc_empty_cardboard">Empty Cardboard</string>
     <string name="quantity_hint">1</string>
+
+    <!-- Tab titles -->
+    <string name="tab_all_items">All items</string>
 </resources>

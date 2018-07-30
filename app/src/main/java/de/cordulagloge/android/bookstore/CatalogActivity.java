@@ -1,13 +1,8 @@
 package de.cordulagloge.android.bookstore;
 
 import android.app.AlertDialog;
-import android.app.LoaderManager;
-import android.content.ContentUris;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,14 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 
+import de.cordulagloge.android.bookstore.data.BookContract;
 import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
-import de.cordulagloge.android.bookstore.databinding.CatalogListHeaderBinding;
 
-import static de.cordulagloge.android.bookstore.data.BookContract.BookEntry;
-
-public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class CatalogActivity extends AppCompatActivity {
 
     private static final int INVENTORY_LOADER = 0;
     private ActivityCatalogBinding binding;
@@ -33,9 +25,14 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_catalog);
         setToolbar();
-        setListView();
+        setViewPager();
         setAddButton();
-        getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
+    }
+
+    private void setViewPager() {
+        binding.viewPager
+              .setAdapter(new SimpleFragmentPageAdapter(getSupportFragmentManager(), this));
+        binding.tabLayout.setupWithViewPager(binding.viewPager);
     }
 
     /**
@@ -43,29 +40,6 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
      */
     private void setToolbar() {
         setSupportActionBar((Toolbar) binding.toolbar);
-    }
-
-    /**
-     * Set Listview and {@link #bookAdapter}
-     * onItemClick: open EditorActivity for clicked item
-     */
-    private void setListView() {
-        bookAdapter = new BookAdapter(this, null, 0);
-        binding.inventoryList.setAdapter(bookAdapter);
-        binding.inventoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent editorIntent = new Intent(CatalogActivity.this, EditorActivity.class);
-                editorIntent.setData(ContentUris.withAppendedId(BookEntry.CONTENT_URI, id));
-                startActivity(editorIntent);
-            }
-        });
-        binding.inventoryList.setEmptyView(binding.emptyLayout);
-        CatalogListHeaderBinding headerBinding = DataBindingUtil.inflate(getLayoutInflater(),
-                R.layout.catalog_list_header,
-                binding.inventoryList,
-                false);
-        binding.inventoryList.addHeaderView(headerBinding.getRoot(), null, false);
     }
 
     /**
@@ -116,13 +90,14 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                getContentResolver().delete(BookEntry.CONTENT_URI,
+                getContentResolver().delete(BookContract.BookEntry.CONTENT_URI,
                         null,
                         null);
             }
         });
         builder.create().show();
     }
+
 
     /**
      * delete sold out items (quantity == 0):
@@ -140,9 +115,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                String selection = BookEntry.COLUMN_BOOK_QUANTITY + "=?";
+                String selection = BookContract.BookEntry.COLUMN_BOOK_QUANTITY + "=?";
                 String[] selectionArgs = new String[]{"0"};
-                getContentResolver().delete(BookEntry.CONTENT_URI,
+                getContentResolver().delete(BookContract.BookEntry.CONTENT_URI,
                         selection,
                         selectionArgs);
             }
@@ -150,30 +125,4 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         builder.create().show();
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // show all columns from books table
-        String[] projection = new String[]{BookEntry._ID,
-                BookEntry.COLUMN_BOOK_NAME,
-                BookEntry.COLUMN_BOOK_PRICE,
-                BookEntry.COLUMN_BOOK_QUANTITY};
-
-        return new CursorLoader(this,
-                BookEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        // change Cursor
-        bookAdapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        bookAdapter.swapCursor(null);
-    }
 }
