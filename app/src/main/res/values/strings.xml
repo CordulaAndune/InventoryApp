@@ -37,9 +37,7 @@
     <string name="quantity_hint">1</string>
 
     <!-- Tab titles -->
-    <string name="tab_all_items">All items</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tab_all_items">All Items</string>
     <string name="tab_in_stock">In Stock</string>
+    <string name="tab_sold_out">Sold Out</string>
 </resources>

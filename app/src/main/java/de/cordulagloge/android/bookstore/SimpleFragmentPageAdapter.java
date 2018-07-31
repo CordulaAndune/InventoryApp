@@ -16,7 +16,9 @@ public class SimpleFragmentPageAdapter extends FragmentPagerAdapter {
     public SimpleFragmentPageAdapter(FragmentManager fm, Context context) {
         super(fm);
         tabTitles = new String[]{
-                context.getString(R.string.tab_all_items)
+                context.getString(R.string.tab_all_items),
+                context.getString(R.string.tab_in_stock),
+                context.getString(R.string.tab_sold_out)
         };
     }
 
@@ -25,6 +27,10 @@ public class SimpleFragmentPageAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 return new AllFragment();
+            case 1:
+                return new InStockFragment();
+            case 2:
+                return new SoldOutFragment();
             default:
                 return new AllFragment();
         }
