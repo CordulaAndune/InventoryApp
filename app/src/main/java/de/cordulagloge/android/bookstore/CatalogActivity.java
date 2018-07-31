@@ -16,9 +16,7 @@ import de.cordulagloge.android.bookstore.databinding.ActivityCatalogBinding;
 
 public class CatalogActivity extends AppCompatActivity {
 
-    private static final int INVENTORY_LOADER = 0;
     private ActivityCatalogBinding binding;
-    private BookAdapter bookAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
